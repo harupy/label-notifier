@@ -9,6 +9,7 @@ inputs:
   config-path:
     description: Path to a configuration file
     required: false
+    default: './.github/.label-notifier.json'
 
 runs:
   using: 'node12'
