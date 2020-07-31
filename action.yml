@@ -1,0 +1,15 @@
+name: 'Labe Notifier'
+description: 'Notify when an issue or a PR has been labeled'
+author: 'harupy'
+branding:
+  color: 'green'
+  icon: 'tag'
+
+inputs:
+  config-path:
+    description: Path to a configuration file
+    required: false
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
