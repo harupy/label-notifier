@@ -2461,6 +2461,13 @@ function main() {
         });
         const comments = listCommentsResp.data;
         console.log(comments);
+        const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
+        octokit.issues.updateComment({
+            owner,
+            repo,
+            comment_id: commentByBot.id,
+            body: new Date().toISOString(),
+        });
         // octokit.issues.createComment({
         //   owner,
         //   repo,
