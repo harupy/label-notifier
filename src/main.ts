@@ -24,12 +24,21 @@ async function main(): Promise<void> {
   const issue_number = github.context.issue.number;
   const { label } = github.context.payload as LabelWebhookPayload;
 
-  octokit.issues.createComment({
+  const listCommentsResp = await octokit.issues.listComments({
     owner,
     repo,
     issue_number,
-    body: label.name,
   });
+
+  const comments = listCommentsResp.data;
+  console.log(comments);
+
+  // octokit.issues.createComment({
+  //   owner,
+  //   repo,
+  //   issue_number,
+  //   body: label.name,
+  // });
 }
 
 main().catch(err => {

@@ -2454,12 +2454,19 @@ function main() {
         const { repo, owner } = github.context.repo;
         const issue_number = github.context.issue.number;
         const { label } = github.context.payload;
-        octokit.issues.createComment({
+        const listCommentsResp = yield octokit.issues.listComments({
             owner,
             repo,
             issue_number,
-            body: label.name,
         });
+        const comments = listCommentsResp.data;
+        console.log(comments);
+        // octokit.issues.createComment({
+        //   owner,
+        //   repo,
+        //   issue_number,
+        //   body: label.name,
+        // });
     });
 }
 main().catch(err => {
