@@ -8,4 +8,6 @@ async function main(): Promise<void> {
   console.log(config);
 }
 
-main();
+main().catch(err => {
+  throw err;
+});

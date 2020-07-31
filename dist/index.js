@@ -93,7 +93,9 @@ function main() {
         console.log(config);
     });
 }
-main();
+main().catch(err => {
+    throw err;
+});
 
 
 /***/ }),
