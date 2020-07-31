@@ -5,6 +5,6 @@ export type Config = {
   [key: string]: string[];
 };
 
-export interface LabelWebhookPayload extends WebhookPayload {
+export interface LabelEventWebhookPayload extends WebhookPayload {
   label: IssuesGetLabelResponseData;
 }

@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-import { LabelWebhookPayload } from './types';
+import { LabelEventWebhookPayload } from './types';
 import { readConfig } from './utils';
 
 async function main(): Promise<void> {
@@ -22,7 +22,7 @@ async function main(): Promise<void> {
 
   const { repo, owner } = github.context.repo;
   const issue_number = github.context.issue.number;
-  const { label } = github.context.payload as LabelWebhookPayload;
+  const { label } = github.context.payload as LabelEventWebhookPayload;
 
   const listCommentsResp = await octokit.issues.listComments({
     owner,
