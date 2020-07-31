@@ -2445,8 +2445,6 @@ function main() {
         const configPath = core.getInput('config-path', { required: false });
         const octokit = github.getOctokit(token);
         const config = utils_1.readConfig(configPath);
-        console.log(github.context);
-        console.log(config);
         const { action } = github.context.payload;
         if (action !== 'labeled') {
             return;
@@ -2463,14 +2461,16 @@ function main() {
             issue_number,
         });
         const comments = listCommentsResp.data;
-        console.log(comments);
         const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
         if (commentByBot === undefined) {
+            const users = config[label.name];
+            users.sort();
+            const body = users.map(u => `@${u}`).join(', ');
             octokit.issues.createComment({
                 owner,
                 repo,
                 issue_number,
-                body: label.name,
+                body,
             });
         }
         else {
@@ -2479,7 +2479,6 @@ function main() {
             const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
             newUsers.sort();
             const newBody = newUsers.map(u => `@${u}`).join(', ');
-            console.log(newBody);
             if (body === newBody) {
                 return;
             }
