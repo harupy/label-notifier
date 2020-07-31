@@ -51,8 +51,13 @@ async function main(): Promise<void> {
     const { body } = commentByBot;
     const oldUsers = extractMentionedUsers(body);
     const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+    newUsers.sort();
     const newBody = newUsers.map(u => `@${u}`).join(', ');
     console.log(newBody);
+
+    if (body === newBody) {
+      return;
+    }
 
     octokit.issues.updateComment({
       owner,

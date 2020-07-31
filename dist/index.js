@@ -2477,8 +2477,12 @@ function main() {
             const { body } = commentByBot;
             const oldUsers = utils_1.extractMentionedUsers(body);
             const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+            newUsers.sort();
             const newBody = newUsers.map(u => `@${u}`).join(', ');
             console.log(newBody);
+            if (body === newBody) {
+                return;
+            }
             octokit.issues.updateComment({
                 owner,
                 repo,
