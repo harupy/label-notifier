@@ -1,10 +1,10 @@
 import { IssuesGetLabelResponseData } from '@octokit/types';
-import { Context } from '@actions/github/lib/context';
+import { WebhookPayload } from '@actions/github/lib/interfaces';
 
 export type Config = {
   [key: string]: string[];
 };
 
-export interface LabelContext extends Context {
-  label?: IssuesGetLabelResponseData;
+export interface LabelWebhookPayload extends WebhookPayload {
+  label: IssuesGetLabelResponseData;
 }

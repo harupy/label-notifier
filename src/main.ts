@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 
-import { LabelContext } from './types';
+import { LabelWebhookPayload } from './types';
 import { readConfig } from './utils';
 
 async function main(): Promise<void> {
@@ -13,7 +13,6 @@ async function main(): Promise<void> {
 
   console.log(github.context);
   console.log(config);
-  console.log(octokit);
 
   const { action } = github.context.payload;
 
@@ -23,12 +22,7 @@ async function main(): Promise<void> {
 
   const { repo, owner } = github.context.repo;
   const issue_number = github.context.issue.number;
-
-  const { label } = github.context as LabelContext;
-
-  if (label === undefined) {
-    return;
-  }
+  const { label } = github.context.payload as LabelWebhookPayload;
 
   octokit.issues.createComment({
     owner,
