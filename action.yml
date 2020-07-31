@@ -6,6 +6,10 @@ branding:
   icon: 'tag'
 
 inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+
   config-path:
     description: Path to a configuration file
     required: false
