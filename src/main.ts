@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import { LabelEventWebhookPayload } from './types';
-import { readConfig } from './utils';
+import { readConfig, extractMentionedUsers } from './utils';
 
 async function main(): Promise<void> {
   const token = core.getInput('github-token', { required: true });
@@ -20,9 +20,14 @@ async function main(): Promise<void> {
     return;
   }
 
+  const { label } = github.context.payload as LabelEventWebhookPayload;
+
+  if (!(label.name in config)) {
+    return;
+  }
+
   const { repo, owner } = github.context.repo;
   const issue_number = github.context.issue.number;
-  const { label } = github.context.payload as LabelEventWebhookPayload;
 
   const listCommentsResp = await octokit.issues.listComments({
     owner,
@@ -35,19 +40,27 @@ async function main(): Promise<void> {
 
   const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
 
-  octokit.issues.updateComment({
-    owner,
-    repo,
-    comment_id: commentByBot.id,
-    body: new Date().toISOString(),
-  });
+  if (commentByBot === undefined) {
+    octokit.issues.createComment({
+      owner,
+      repo,
+      issue_number,
+      body: label.name,
+    });
+  } else {
+    const { body } = commentByBot;
+    const oldUsers = extractMentionedUsers(body);
+    const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+    const newBody = newUsers.map(u => `@${u}`).join(', ');
+    console.log(newBody);
 
-  // octokit.issues.createComment({
-  //   owner,
-  //   repo,
-  //   issue_number,
-  //   body: label.name,
-  // });
+    octokit.issues.updateComment({
+      owner,
+      repo,
+      comment_id: commentByBot.id,
+      body: newBody,
+    });
+  }
 }
 
 main().catch(err => {

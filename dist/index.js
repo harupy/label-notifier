@@ -2451,9 +2451,12 @@ function main() {
         if (action !== 'labeled') {
             return;
         }
+        const { label } = github.context.payload;
+        if (!(label.name in config)) {
+            return;
+        }
         const { repo, owner } = github.context.repo;
         const issue_number = github.context.issue.number;
-        const { label } = github.context.payload;
         const listCommentsResp = yield octokit.issues.listComments({
             owner,
             repo,
@@ -2462,18 +2465,27 @@ function main() {
         const comments = listCommentsResp.data;
         console.log(comments);
         const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
-        octokit.issues.updateComment({
-            owner,
-            repo,
-            comment_id: commentByBot.id,
-            body: new Date().toISOString(),
-        });
-        // octokit.issues.createComment({
-        //   owner,
-        //   repo,
-        //   issue_number,
-        //   body: label.name,
-        // });
+        if (commentByBot === undefined) {
+            octokit.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: label.name,
+            });
+        }
+        else {
+            const { body } = commentByBot;
+            const oldUsers = utils_1.extractMentionedUsers(body);
+            const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+            const newBody = newUsers.map(u => `@${u}`).join(', ');
+            console.log(newBody);
+            octokit.issues.updateComment({
+                owner,
+                repo,
+                comment_id: commentByBot.id,
+                body: newBody,
+            });
+        }
     });
 }
 main().catch(err => {
@@ -6791,7 +6803,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.readConfig = exports.readFile = void 0;
+exports.extractMentionedUsers = exports.readConfig = exports.readFile = void 0;
 const fs_1 = __importDefault(__webpack_require__(747));
 function readFile(path) {
     return fs_1.default.readFileSync(path, 'utf8');
@@ -6803,6 +6815,18 @@ function readConfig(path) {
     return config;
 }
 exports.readConfig = readConfig;
+function extractMentionedUsers(body) {
+    function helper(regex, mentions = []) {
+        const res = regex.exec(body);
+        if (res) {
+            const user = res[1].trim();
+            return helper(regex, [...mentions, user]);
+        }
+        return mentions;
+    }
+    return helper(new RegExp('@([\\w-]+)', 'g'));
+}
+exports.extractMentionedUsers = extractMentionedUsers;
 
 
 /***/ }),
