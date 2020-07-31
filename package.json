@@ -10,6 +10,7 @@
     "format:non-js": "prettier --write --config ./.prettierrc.js --ignore-path .prettierignore \"./**/*.{md,yml,json}\"",
     "lint:js": "eslint src/**/*.ts",
     "lint:non-js": "prettier --check --config ./.prettierrc.js --ignore-path .prettierignore \"./**/*.{md,yml,json}\"",
+    "lint": "npm run lint:js && npm run lint:non-js",
     "test": "jest --verbose --colors"
   },
   "dependencies": {},
