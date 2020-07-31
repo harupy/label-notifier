@@ -2448,6 +2448,22 @@ function main() {
         console.log(github.context);
         console.log(config);
         console.log(octokit);
+        const { action } = github.context.payload;
+        if (action !== 'labeled') {
+            return;
+        }
+        const { repo, owner } = github.context.repo;
+        const issue_number = github.context.issue.number;
+        const { label } = github.context;
+        if (label === undefined) {
+            return;
+        }
+        octokit.issues.createComment({
+            owner,
+            repo,
+            issue_number,
+            body: label.name,
+        });
     });
 }
 main().catch(err => {
