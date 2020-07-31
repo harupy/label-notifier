@@ -1,3 +1,5 @@
 {
-  "bug": ["harupy"]
+  "bug": ["harupy"],
+  "enhancement": ["harupy"],
+  "duplicate": ["harupy"]
 }
