@@ -1,4 +1,4 @@
-import { readFile, readConfig } from '../src/utils';
+import { readFile, readConfig, extractMentionedUsers } from '../src/utils';
 
 import fs from 'fs';
 import tmp from 'tmp';
@@ -33,4 +33,10 @@ describe('utils', (): void => {
       });
     },
   );
+
+  it(extractMentionedUsers.name, () => {
+    expect(extractMentionedUsers('@foo')).toEqual(['foo']);
+    expect(extractMentionedUsers('@foo, @bar')).toEqual(['foo', 'bar']);
+    expect(extractMentionedUsers('foo')).toEqual([]);
+  });
 });
