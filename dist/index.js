@@ -300,6 +300,18 @@ module.exports._enoent = enoent;
 
 /***/ }),
 
+/***/ 32:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SIGNATURE = void 0;
+exports.SIGNATURE = 'LABEL_NOTIFIER';
+
+
+/***/ }),
+
 /***/ 39:
 /***/ (function(module) {
 
@@ -2438,6 +2450,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
+const constants_1 = __webpack_require__(32);
 const utils_1 = __webpack_require__(611);
 function main() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -2463,11 +2476,14 @@ function main() {
             issue_number,
         });
         const comments = listCommentsResp.data;
-        const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
+        const signature = utils_1.createMarkdownComment(constants_1.SIGNATURE);
+        const [commentByBot] = comments.filter(({ user, body }) => {
+            return user.login === 'github-actions[bot]' && body.includes(signature);
+        });
         if (commentByBot === undefined) {
             const users = config[label.name];
             users.sort();
-            const body = users.map(u => `@${u}`).join(', ');
+            const body = users.map(u => `@${u}`).join(', ') + `\n\n${signature}`;
             octokit.issues.createComment({
                 owner,
                 repo,
@@ -2477,12 +2493,12 @@ function main() {
         }
         else {
             console.log('Found a comment posted by this bot');
-            const { body } = commentByBot;
-            const oldUsers = utils_1.extractMentionedUsers(body);
+            const { body: oldBody } = commentByBot;
+            const oldUsers = utils_1.extractMentionedUsers(oldBody);
             const newUsers = utils_1.removeDuplicates([...oldUsers, ...config[label.name]]);
             newUsers.sort();
-            const newBody = newUsers.map(u => `@${u}`).join(', ');
-            if (body === newBody) {
+            const newBody = newUsers.map(u => `@${u}`).join(', ') + `\n\n${signature}`;
+            if (oldBody === newBody) {
                 return;
             }
             octokit.issues.updateComment({
@@ -6809,7 +6825,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeDuplicates = exports.extractMentionedUsers = exports.readConfig = exports.readFile = void 0;
+exports.createMarkdownComment = exports.removeDuplicates = exports.extractMentionedUsers = exports.readConfig = exports.readFile = void 0;
 const fs_1 = __importDefault(__webpack_require__(747));
 function readFile(path) {
     return fs_1.default.readFileSync(path, 'utf8');
@@ -6837,6 +6853,10 @@ function removeDuplicates(arr) {
     return [...new Set(arr)];
 }
 exports.removeDuplicates = removeDuplicates;
+function createMarkdownComment(body) {
+    return `<!-- ${body} -->`;
+}
+exports.createMarkdownComment = createMarkdownComment;
 
 
 /***/ }),

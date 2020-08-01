@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import { LabelEventWebhookPayload } from './types';
-import { SIGNATURE } from 'constants';
+import { SIGNATURE } from './constants';
 import {
   readConfig,
   extractMentionedUsers,
