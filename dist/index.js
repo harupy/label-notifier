@@ -2447,10 +2447,12 @@ function main() {
         const config = utils_1.readConfig(configPath);
         const { action } = github.context.payload;
         if (action !== 'labeled') {
+            console.log("This is not a 'labeled' event");
             return;
         }
         const { label } = github.context.payload;
         if (!(label.name in config)) {
+            console.log(`Label '${label.name}' doesn't exist in the configuration file`);
             return;
         }
         const { repo, owner } = github.context.repo;
@@ -2474,6 +2476,7 @@ function main() {
             });
         }
         else {
+            console.log('Found a comment posted by this bot');
             const { body } = commentByBot;
             const oldUsers = utils_1.extractMentionedUsers(body);
             const newUsers = utils_1.removeDuplicates([...oldUsers, ...config[label.name]]);

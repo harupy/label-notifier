@@ -14,12 +14,14 @@ async function main(): Promise<void> {
   const { action } = github.context.payload;
 
   if (action !== 'labeled') {
+    console.log("This is not a 'labeled' event");
     return;
   }
 
   const { label } = github.context.payload as LabelEventWebhookPayload;
 
   if (!(label.name in config)) {
+    console.log(`Label '${label.name}' doesn't exist in the configuration file`);
     return;
   }
 
@@ -48,6 +50,7 @@ async function main(): Promise<void> {
       body,
     });
   } else {
+    console.log('Found a comment posted by this bot');
     const { body } = commentByBot;
     const oldUsers = extractMentionedUsers(body);
     const newUsers = removeDuplicates([...oldUsers, ...config[label.name]]);
