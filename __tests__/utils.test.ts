@@ -4,7 +4,6 @@ import {
   extractMentionedUsers,
   removeDuplicates,
   createMarkdownComment,
-  containsSignature,
 } from '../src/utils';
 
 import fs from 'fs';
