@@ -2,7 +2,13 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import { LabelEventWebhookPayload } from './types';
-import { readConfig, extractMentionedUsers, removeDuplicates } from './utils';
+import { SIGNATURE } from 'constants';
+import {
+  readConfig,
+  extractMentionedUsers,
+  removeDuplicates,
+  createMarkdownComment,
+} from './utils';
 
 async function main(): Promise<void> {
   const token = core.getInput('github-token', { required: true });
@@ -36,12 +42,15 @@ async function main(): Promise<void> {
 
   const comments = listCommentsResp.data;
 
-  const [commentByBot] = comments.filter(c => c.user.login === 'github-actions[bot]');
+  const signature = createMarkdownComment(SIGNATURE);
+  const [commentByBot] = comments.filter(({ user, body }) => {
+    return user.login === 'github-actions[bot]' && body.includes(signature);
+  });
 
   if (commentByBot === undefined) {
     const users = config[label.name];
     users.sort();
-    const body = users.map(u => `@${u}`).join(', ');
+    const body = users.map(u => `@${u}`).join(', ') + `\n\n${signature}`;
 
     octokit.issues.createComment({
       owner,
@@ -51,13 +60,13 @@ async function main(): Promise<void> {
     });
   } else {
     console.log('Found a comment posted by this bot');
-    const { body } = commentByBot;
-    const oldUsers = extractMentionedUsers(body);
+    const { body: oldBody } = commentByBot;
+    const oldUsers = extractMentionedUsers(oldBody);
     const newUsers = removeDuplicates([...oldUsers, ...config[label.name]]);
     newUsers.sort();
-    const newBody = newUsers.map(u => `@${u}`).join(', ');
+    const newBody = newUsers.map(u => `@${u}`).join(', ') + `\n\n${signature}`;
 
-    if (body === newBody) {
+    if (oldBody === newBody) {
       return;
     }
 

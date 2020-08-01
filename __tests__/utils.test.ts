@@ -3,6 +3,8 @@ import {
   readConfig,
   extractMentionedUsers,
   removeDuplicates,
+  createMarkdownComment,
+  containsSignature,
 } from '../src/utils';
 
 import fs from 'fs';
@@ -50,5 +52,9 @@ describe('utils', (): void => {
     expect(removeDuplicates(['foo', 'bar']).sort()).toEqual(['bar', 'foo']);
     expect(removeDuplicates(['foo']).sort()).toEqual(['foo']);
     expect(removeDuplicates([]).sort()).toEqual([]);
+  });
+
+  it(createMarkdownComment.name, () => {
+    expect(createMarkdownComment('comment')).toEqual('<!-- comment -->');
   });
 });

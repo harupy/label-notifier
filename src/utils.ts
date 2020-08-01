@@ -1,5 +1,7 @@
-import { Config } from './types';
 import fs from 'fs';
+
+import { Config } from './types';
+import { SIGNATURE } from './constants';
 
 export function readFile(path: string): string {
   return fs.readFileSync(path, 'utf8');
@@ -26,4 +28,8 @@ export function extractMentionedUsers(body: string): string[] {
 
 export function removeDuplicates<T>(arr: T[]): T[] {
   return [...new Set(arr)];
+}
+
+export function createMarkdownComment(body: string): string {
+  return `<!-- ${body} -->`;
 }
