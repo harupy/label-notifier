@@ -1,4 +1,9 @@
-import { readFile, readConfig, extractMentionedUsers } from '../src/utils';
+import {
+  readFile,
+  readConfig,
+  extractMentionedUsers,
+  removeDuplicates,
+} from '../src/utils';
 
 import fs from 'fs';
 import tmp from 'tmp';
@@ -38,5 +43,12 @@ describe('utils', (): void => {
     expect(extractMentionedUsers('@foo')).toEqual(['foo']);
     expect(extractMentionedUsers('@foo, @bar')).toEqual(['foo', 'bar']);
     expect(extractMentionedUsers('foo')).toEqual([]);
+  });
+
+  it(removeDuplicates.name, () => {
+    expect(removeDuplicates(['foo', 'bar', 'bar']).sort()).toEqual(['bar', 'foo']);
+    expect(removeDuplicates(['foo', 'bar']).sort()).toEqual(['bar', 'foo']);
+    expect(removeDuplicates(['foo']).sort()).toEqual(['foo']);
+    expect(removeDuplicates([]).sort()).toEqual([]);
   });
 });

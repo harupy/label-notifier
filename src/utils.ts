@@ -23,3 +23,7 @@ export function extractMentionedUsers(body: string): string[] {
   }
   return helper(new RegExp('@([\\w-]+)', 'g'));
 }
+
+export function removeDuplicates<T>(arr: T[]): T[] {
+  return [...new Set(arr)];
+}

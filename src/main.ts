@@ -2,7 +2,7 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import { LabelEventWebhookPayload } from './types';
-import { readConfig, extractMentionedUsers } from './utils';
+import { readConfig, extractMentionedUsers, removeDuplicates } from './utils';
 
 async function main(): Promise<void> {
   const token = core.getInput('github-token', { required: true });
@@ -50,7 +50,7 @@ async function main(): Promise<void> {
   } else {
     const { body } = commentByBot;
     const oldUsers = extractMentionedUsers(body);
-    const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+    const newUsers = removeDuplicates([...oldUsers, ...config[label.name]]);
     newUsers.sort();
     const newBody = newUsers.map(u => `@${u}`).join(', ');
 

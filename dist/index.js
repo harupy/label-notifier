@@ -2476,7 +2476,7 @@ function main() {
         else {
             const { body } = commentByBot;
             const oldUsers = utils_1.extractMentionedUsers(body);
-            const newUsers = [...new Set([...oldUsers, ...config[label.name]])];
+            const newUsers = utils_1.removeDuplicates([...oldUsers, ...config[label.name]]);
             newUsers.sort();
             const newBody = newUsers.map(u => `@${u}`).join(', ');
             if (body === newBody) {
@@ -6806,7 +6806,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.extractMentionedUsers = exports.readConfig = exports.readFile = void 0;
+exports.removeDuplicates = exports.extractMentionedUsers = exports.readConfig = exports.readFile = void 0;
 const fs_1 = __importDefault(__webpack_require__(747));
 function readFile(path) {
     return fs_1.default.readFileSync(path, 'utf8');
@@ -6830,6 +6830,10 @@ function extractMentionedUsers(body) {
     return helper(new RegExp('@([\\w-]+)', 'g'));
 }
 exports.extractMentionedUsers = extractMentionedUsers;
+function removeDuplicates(arr) {
+    return [...new Set(arr)];
+}
+exports.removeDuplicates = removeDuplicates;
 
 
 /***/ }),
